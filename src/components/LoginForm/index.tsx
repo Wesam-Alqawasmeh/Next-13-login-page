@@ -2,30 +2,51 @@
 import { useForm } from 'react-hook-form';
 import {
 	Button,
-	Container,
+	Wrapper,
 	ErrorText,
 	Form,
 	Input,
 	Label,
 	Title,
 } from '@/components/LoginForm/styles';
-import { DataType, resolver } from '@/components/LoginForm/types';
+import { resolver } from '@/components/LoginForm/types';
+import { FormDataType } from '@/lib/types';
+import { signIn } from 'next-auth/react';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginForm(): React.JSX.Element {
+	// useForm will handle the inputs change instead of creating a state for each one
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<DataType>({ resolver });
+	} = useForm<FormDataType>({ resolver });
 
-	const onSubmit = (data: DataType) => {
-		// TODO: add logic to post the data to the api.
-		console.log('Logging in:', data);
+	const [loginErrors, setLoginErrors] = useState('');
+
+	const router = useRouter();
+
+	const onSubmit = async ({ username, password }: FormDataType): Promise<any> => {
+		try {
+			const res = await signIn('credentials', { username, password, redirect: false });
+
+			if (res?.error) {
+				setLoginErrors('Invalid Credentials');
+			}
+
+			// route to the homepage when the user login
+			if (res?.ok) {
+				router.replace('/');
+			}
+		} catch (error) {
+			console.log('Error:', error);
+		}
 	};
 
 	return (
-		<Container>
-			<Form onSubmit={handleSubmit(onSubmit)}>
+		<Wrapper>
+			<Form onSubmit={handleSubmit(onSubmit)} onClick={() => setLoginErrors('')}>
 				<Title>Login</Title>
 				<Label htmlFor="username">Username</Label>
 				<Input
@@ -45,8 +66,9 @@ export default function LoginForm(): React.JSX.Element {
 					{...register('password', { required: 'Password is required' })}
 				/>
 				{errors?.password && <ErrorText>{errors.password.message}</ErrorText>}
+				{loginErrors && <ErrorText>{loginErrors}</ErrorText>}
 				<Button type="submit">Login</Button>
 			</Form>
-		</Container>
+		</Wrapper>
 	);
 }

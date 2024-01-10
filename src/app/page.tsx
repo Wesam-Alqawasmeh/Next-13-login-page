@@ -1,12 +1,14 @@
-import { Container, Headline } from '@/app/styles';
-import Link from 'next/link';
+import { Container, Wrapper } from '@/app/styles';
+import HomeHeader from '@/components/HomeHeader';
+import Logout from '@/components/Logout';
 
 export default function Home(): React.JSX.Element {
 	return (
 		<Container>
-			<Headline>
-				Hi! Checkout the Login page <Link href={'/login'}>here</Link>
-			</Headline>
+			<Wrapper>
+				<HomeHeader />
+				<Logout />
+			</Wrapper>
 		</Container>
 	);
 }

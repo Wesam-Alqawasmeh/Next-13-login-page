@@ -1,13 +1,10 @@
 import { Resolver } from 'react-hook-form';
+import { FormDataType } from '@/lib/types';
 
-export interface DataType {
-	username: string;
-	password: string;
-}
-
-export const resolver: Resolver<DataType> = async (values) => {
+export const resolver: Resolver<FormDataType> = async (values) => {
 	return {
 		values: values.username || values.password ? values : {},
+		// define all possible values for the errors
 		errors: (() => {
 			if (!values.username && !values.password) {
 				return {
